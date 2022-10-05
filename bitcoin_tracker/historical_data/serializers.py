@@ -10,5 +10,6 @@ class PriceHistorySerializer(serializers.ModelSerializer):
         fields = (
             'date',
             'price',
-            'volume'
+            'volume',
+            'user'
         )
