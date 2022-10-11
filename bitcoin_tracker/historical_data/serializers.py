@@ -11,5 +11,6 @@ class PriceHistorySerializer(serializers.ModelSerializer):
             'date',
             'price',
             'volume',
-            'user'
+            'user',
+            'wallet'
         )

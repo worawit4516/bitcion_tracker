@@ -8,3 +8,6 @@ class Account(models.Model):
 
     first_name = models.CharField(max_length=120, db_index=True, blank=True, null=True, default='Guest')
     last_name = models.CharField(max_length=120, db_index=True, blank=True, null=True, default='Guest')
+    is_active = models.BooleanField(default=True)
+    friends = models.TextField(default='[]')
+    datetime_create = models.DateTimeField(auto_now_add=True)

@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'rest_framework',
 
     'historical_data',
-    'account'
+    'account',
+    'wallet'
 ]
 
 MIDDLEWARE = [

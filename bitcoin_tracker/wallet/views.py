@@ -3,15 +3,24 @@ from rest_framework import mixins, viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from historical_data.models import PriceHistory
-from historical_data.serializers import PriceHistorySerializer
 from wallet.models import Wallet
-from wallet.serializers import WalletCreateSerializer, WalletDetailSerializer, WalletSerializer
+from wallet.serializers import WalletCreateSerializer, WalletDetailSerializer
 
 
-class PriceHistoryView(viewsets.GenericViewSet, mixins.UpdateModelMixin):
-    queryset = PriceHistory.objects.all()
-    serializer_class = PriceHistorySerializer
+class WalletView(viewsets.GenericViewSet, mixins.UpdateModelMixin):
+    queryset = Wallet.objects.all()
+    action_serializers = {
+        'create': WalletCreateSerializer,
+        'partial_update': WalletDetailSerializer,
+        'retrieve': WalletDetailSerializer,
+        'list': WalletDetailSerializer
+    }
+
+    def get_serializer_class(self):
+        if hasattr(self, 'action_serializers'):
+            if self.action in self.action_serializers:
+                return self.action_serializers[self.action]
+        return super().get_serializer_class()
 
     def create(self, request, *args, **kwargs):
         try:
@@ -23,13 +32,7 @@ class PriceHistoryView(viewsets.GenericViewSet, mixins.UpdateModelMixin):
             # serializer.validated_data
             data = serializer.save()
         except Exception as e:
-            return Response(data={'Response': f'save new price history failed {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        # wallet = Wallet.objects.filter(pk=data.wallet)
-        # wallet_serializer = WalletSerializer(data=wallet)
-        # wallet_serializer.is_valid(raise_exception=True)
-        # wallet_serializer.validated_data['balance'] += request.data.balance
-        # wallet_serializer.validated_data['volume'] += request.data.volume
-        # wallet_serializer.save()
+            return Response(data={'Response': f'save new wallet failed {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def list(self, request):
@@ -39,8 +42,8 @@ class PriceHistoryView(viewsets.GenericViewSet, mixins.UpdateModelMixin):
 
     def retrieve(self, request, *args, **kwargs):
         try:
-            price_history = self.get_queryset().get(pk=kwargs['pk'])
-            serializer = self.get_serializer(price_history)
+            wallet = self.get_queryset().get(pk=kwargs['pk'])
+            serializer = self.get_serializer(Wallet)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             print(e)
