@@ -24,12 +24,10 @@ class PriceHistoryView(viewsets.GenericViewSet, mixins.UpdateModelMixin):
             data = serializer.save()
         except Exception as e:
             return Response(data={'Response': f'save new price history failed {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        # wallet = Wallet.objects.filter(pk=data.wallet)
-        # wallet_serializer = WalletSerializer(data=wallet)
-        # wallet_serializer.is_valid(raise_exception=True)
-        # wallet_serializer.validated_data['balance'] += request.data.balance
-        # wallet_serializer.validated_data['volume'] += request.data.volume
-        # wallet_serializer.save()
+        wallet = data.wallet  # serializer can access object of field that relate in own data
+        wallet.balance += request.data["price"]  # When call field in request that is dict not JS
+        wallet.volume += request.data["volume"]
+        wallet.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def list(self, request):
