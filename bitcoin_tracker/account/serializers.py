@@ -22,6 +22,7 @@ class AccountSerializer(serializers.ModelSerializer):
             'first_name',
             'last_name',
             'friends',
+            'wallet'
         )
 
         def get_friends(self, account):

@@ -2,9 +2,12 @@ from django.shortcuts import render
 from rest_framework import mixins, viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
 
 from account.models import Account
 from account.serializers import AccountSerializer, AccountHistorySerializer
+
+import json
 
 
 class AccountView(viewsets.GenericViewSet, mixins.UpdateModelMixin):
@@ -47,4 +50,15 @@ class AccountView(viewsets.GenericViewSet, mixins.UpdateModelMixin):
             print(e)
             return Response(data=str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    @action(methods=['POST'], detail=True, url_path='add_friend', url_name='add_friend')
+    def add_friend(self, request, *args, **kwargs):
+        try:
+            account = Account.objects.get(pk=kwargs['pk'])
+            friends = json.loads(account.friends)
+            friends.append(request.data["friend"])
+            account.friends = json.dumps(friends)
+            account.save()
+        except Exception as e:
+            return Response(data={'Response': f'save new friend failed {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response(account.friends, status=status.HTTP_201_CREATED)
 
